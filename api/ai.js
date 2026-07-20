@@ -35,6 +35,18 @@ Strength exercises include sets/repTarget/startWeight (omit cardio). Cardio exer
 
 const COACH_SYS = `You are Swift, a triathlon and Hyrox coach adjusting ONE training session. Keep the session's purpose and energy system (don't turn an easy Z2 session into intervals). The athlete's home equipment is a rower, kettlebells, dumbbells/weights, and a barbell (no ski-erg, sled, wall ball, sandbag, or box) - substitute accordingly. Reply in plain text: a short, clear replacement session (a few lines with the key numbers). No preamble, no medical claims.`;
 
+const CHAT_SYS = `You are Swift, a friendly, knowledgeable hybrid fitness coach chatting with a user inside the Swift app. You can answer training/nutrition/fitness questions, explain or adjust their workouts, and help them log things. You are given CONTEXT (their plan, today's session, recent weight, goals, benchmark lifts) — use it to personalize and reference specifics.
+
+You can trigger app actions. ALWAYS respond with VALID JSON ONLY, no markdown or code fences:
+{"reply":"<warm, concise message to the user>","actions":[ ...zero or more... ]}
+
+Supported actions (include ONLY when the user clearly asks):
+- {"type":"log_weight","weight_lb":NUMBER}
+- {"type":"log_strength","name":"Exercise name","sets":[{"weight_lb":NUMBER,"reps":NUMBER}]}
+- {"type":"set_goal","goal_type":"weight|lift|event|consistency","title":"short title","target_value":NUMBER_or_null,"unit":"lb_or_null","target_date":"YYYY-MM-DD_or_null"}
+
+Rules: Never invent numbers the user didn't give. If they only ask a question, return "actions":[]. When you DO log/set something, confirm it in the reply. Keep reply under 120 words, plain text. No medical claims; if the user reports pain (not normal soreness), advise rest and seeing a professional.`;
+
 async function verifyUser(token) {
   if (!token) return false;
   try {
@@ -50,7 +62,7 @@ async function callClaude(system, userMsg, maxTokens) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "x-api-key": (process.env.ANTHROPIC_API_KEY || "").trim(),
       "anthropic-version": "2023-06-01"
     },
     body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, temperature: 0.4, system, messages: [{ role: "user", content: userMsg }] })
@@ -69,6 +81,20 @@ module.exports = async function handler(req, res) {
 
   const body = req.body || {};
   try {
+    if (body.type === "chat") {
+      const ctx = body.context ? JSON.stringify(body.context) : "{}";
+      const msg = `CONTEXT:\n${ctx}\n\nUSER: ${body.message || ""}`;
+      let txt = await callClaude(CHAT_SYS, msg, 900);
+      txt = txt.replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+      const a = txt.indexOf("{"), b = txt.lastIndexOf("}");
+      let out;
+      try { out = JSON.parse(a >= 0 && b >= 0 ? txt.slice(a, b + 1) : txt); }
+      catch (e) { out = { reply: txt, actions: [] }; }
+      if (!out.reply) out.reply = "Okay.";
+      if (!Array.isArray(out.actions)) out.actions = [];
+      res.status(200).json(out);
+      return;
+    }
     if (body.type === "adjust") {
       const s = body.session || {};
       const msg = `Session: ${s.sport} - ${s.title} (${s.target}). ${(s.detail || []).join(" ")}\n\nAdjustment requested: ${body.request || "sensible swap"}\n\nGive the adjusted session.`;
