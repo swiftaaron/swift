@@ -91,15 +91,41 @@
   a{color:var(--gold)}
   .fbtn{position:fixed;right:calc(50% - 218px);bottom:92px;z-index:50;background:var(--ink);color:#fff;border:none;border-radius:22px;padding:10px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.2)}
   @media(max-width:480px){.fbtn{right:16px}}
+  /* homepage + chat + steps + metrics */
+  .chatentry{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--gold-soft);border-radius:16px;padding:14px 16px;cursor:pointer;box-shadow:0 4px 14px rgba(201,162,75,.12)}
+  .chatentry .q{flex:1;color:var(--ink-soft);font-size:14px;font-weight:600}
+  .chatentry .go{width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
+  .steps{display:flex;gap:6px;padding:0 0 6px}
+  .steps i{height:4px;flex:1;border-radius:3px;background:var(--line)}
+  .steps i.on{background:var(--gold)}
+  .chatwrap{display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:340px}
+  .msgs{flex:1;overflow-y:auto;padding:6px 2px 12px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:82%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap}
+  .msg.me{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:5px}
+  .msg.ai{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:5px}
+  .msg.sys{align-self:center;background:#FBF6EA;color:#9a771f;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px}
+  .chatbar{display:flex;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .chatbar input{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:22px;padding:12px 16px;font-size:15px;color:var(--ink)}
+  .chatbar input:focus{outline:none;border-color:var(--gold)}
+  .chatbar button{width:46px;height:46px;border-radius:50%;background:var(--gold);color:#fff;border:none;font-size:18px;cursor:pointer;flex:0 0 auto}
+  .liftrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .liftrow:last-child{border-bottom:none}
+  .liftrow .ln{font-weight:700;font-size:14.5px;flex:1}
+  .liftrow .lv{font-weight:800;font-size:15px}.liftrow .lv small{color:var(--ink-soft);font-weight:600;font-size:11px}
+  .goalcard{border-left:4px solid var(--gold);background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:10px}
+  .goalcard .gt{font-weight:700;font-size:14.5px}
+  .gprog{height:7px;background:#F1F2F5;border-radius:5px;margin-top:9px;overflow:hidden}
+  .gprog i{display:block;height:100%;background:var(--gold);border-radius:5px}
+  .count{font-size:11px;font-weight:700;color:var(--gold)}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="root"><div class="center"><div class="ring"></div><p class="sub" style="text-align:center;margin-top:16px">Loading Swift…</p></div></div>
   <div class="tabbar" id="tabbar" style="display:none">
-    <div class="tab" data-tab="today"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg><span>Today</span></div>
+    <div class="tab" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg><span>Home</span></div>
     <div class="tab" data-tab="plan"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Plan</span></div>
-    <div class="tab" data-tab="progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Progress</span></div>
+    <div class="tab" data-tab="progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Metrics</span></div>
     <div class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Profile</span></div>
   </div>
   <button class="fbtn" id="fbtn" style="display:none">Send feedback</button>
