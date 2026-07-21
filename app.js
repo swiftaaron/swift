@@ -60,3 +60,4 @@ async function loadProfile() {
   const uid = session.user.id;
   let { data } = await sb.from("profiles").select("*").eq("user_id", uid).maybeSingle();
   if (!data) {
+boot();
